@@ -5,7 +5,7 @@ const Home: React.FC = () => {
   return (
     <div>
       <h1>AI-Powered Cloud Management</h1>
-      {/* <VoiceCommand /> */}
+      <VoiceCommand />
       <Dashboard />
     </div>
   );
