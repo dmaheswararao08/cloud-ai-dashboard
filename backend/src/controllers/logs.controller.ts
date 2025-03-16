@@ -10,6 +10,7 @@ export const getServiceLogs = async (req: CustomRequest, res: Response, next: Ne
 
     // Emit logs update through Socket.IO
     if (req.io) {
+        console.log("Sending serviceLogs to clients...");
       req.io.emit("serviceLogs", { serviceName, logs });
     }
 

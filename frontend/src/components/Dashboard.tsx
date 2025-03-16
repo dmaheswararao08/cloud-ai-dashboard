@@ -1,82 +1,206 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
+import {
+  Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper, Typography,
+  Box, List, ListItem, ListItemText, Button
+} from "@mui/material";
+import axios from "axios";
 
-const socket = io("http://localhost:5000");
+// ✅ Connect to Socket.IO server
+const socket = io("http://localhost:5000", {
+  transports: ["websocket"],
+  reconnectionAttempts: 5,
+  reconnectionDelay: 3000,
+});
 
 const Dashboard = () => {
+  // ✅ Service Interface
   interface Service {
     name: string;
     podCount: number;
-    status: string;
+    status: "Running" | "Stopped";
   }
 
-  const [services, setServices] = useState<Service[]>([]);
+  // ✅ Log Interface
   interface Log {
     timestamp: string;
     message: string;
   }
 
+  // ✅ States
+  const [services, setServices] = useState<Service[]>([]);
   const [logs, setLogs] = useState<Log[]>([]);
 
+  // ✅ Fetch initial data from API
   useEffect(() => {
-    socket.on("connect", () => {
-      console.log("Connected to Socket.IO server:", socket.id);
-    });
+    console.log("📡 Connecting to Socket.IO...",fetch("http://localhost:5000/api/servers")); 
+    console.log("📡 Connecting to Socket.IO...",fetch("http://localhost:5000/api/logs/sample"));
 
+    // ✅ Listen for real-time updates
     socket.on("updateServers", (data) => {
-      console.log("Received real-time server update:", data);
+      console.log("🔄 Received Server Update:", data);
       setServices(data);
     });
 
-    socket.on("disconnect", () => {
-      console.log("Socket disconnected. Attempting to reconnect...");
+    socket.on("serviceLogs", ({ logs }) => {
+      console.log("📜 Received Logs Update:", logs);
+      setLogs((prevLogs) => [...prevLogs, ...logs]);
     });
 
     return () => {
       socket.off("updateServers");
-      socket.off("connect");
-      socket.off("disconnect");
+      socket.off("serviceLogs");
     };
   }, []);
 
-  return (
-    <div>
-      <h2>Running Services</h2>
-      <table border={1}>
-        <thead>
-          <tr>
-            <th>Service Name</th>
-            <th>Pod Count</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {services.map((service, index) => (
-            <tr key={index}>
-              <td>{service.name}</td>
-              <td>{service.podCount}</td>
-              <td>{service.status}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+  // ✅ Start Service
+  const handleStartService = async (serviceName: string) => {
+    try {
+      await axios.post(`http://localhost:5000/api/servers/${serviceName}/start`);
+      setServices((prev) =>
+        prev.map((service) =>
+          service.name === serviceName ? { ...service, status: "Running" } : service
+        )
+      );
+    } catch (error) {
+      console.error("Error starting service:", error);
+    }
+  };
 
-      <h2>Logs</h2>
-      <div
-        style={{
-          maxHeight: "200px",
-          overflowY: "scroll",
-          border: "1px solid gray",
-          padding: "10px",
-        }}
-      >
-        {logs.map((log, index) => (
-          <p key={index}>
-            {log.timestamp}: {log.message}
-          </p>
-        ))}
-      </div>
-    </div>
+  // ✅ Stop Service
+  const handleStopService = async (serviceName: string) => {
+    try {
+      await axios.post(`http://localhost:5000/api/servers/${serviceName}/stop`);
+      setServices((prev) =>
+        prev.map((service) =>
+          service.name === serviceName ? { ...service, status: "Stopped" } : service
+        )
+      );
+    } catch (error) {
+      console.error("Error stopping service:", error);
+    }
+  };
+
+  // ✅ Scale Up Service
+  const handleScaleUp = async () => {
+    try {
+      await axios.post(`http://localhost:5000/api/servers/scale/up`);
+      setServices((prev) =>
+        prev.map((service) => ({ ...service, podCount: service.podCount + 1 }))
+      );
+    } catch (error) {
+      console.error("Error scaling up:", error);
+    }
+  };
+
+  // ✅ Scale Down Service
+  const handleScaleDown = async (serviceName: string) => {
+    try {
+      await axios.post(`http://localhost:5000/api/servers/${serviceName}/scale/down`);
+      setServices((prev) =>
+        prev.map((service) =>
+          service.name === serviceName
+            ? { ...service, podCount: Math.max(0, service.podCount - 1) }
+            : service
+        )
+      );
+    } catch (error) {
+      console.error("Error scaling down:", error);
+    }
+  };
+
+  return (
+    <Box sx={{ padding: "20px" }}>
+      
+      {/* 🔹 Running Services Table */}
+      <Typography variant="h5" gutterBottom>Running Services</Typography>
+      <TableContainer component={Paper} sx={{ marginBottom: "20px" }}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell><b>Service Name</b></TableCell>
+              <TableCell><b>Pod Count</b></TableCell>
+              <TableCell><b>Status</b></TableCell>
+              <TableCell><b>Actions</b></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {services.map((service, index) => (
+              <TableRow key={index}>
+                <TableCell>{service.name}</TableCell>
+                <TableCell>{service.podCount}</TableCell>
+                <TableCell
+                  sx={{
+                    color: service.status === "Running" ? "green" : "red",
+                    fontWeight: "bold"
+                  }}
+                >
+                  {service.status}
+                </TableCell>
+                <TableCell>
+                  {/* Start Button */}
+                  {service.status === "Stopped" && (
+                    <Button
+                      variant="contained"
+                      color="success"
+                      onClick={() => handleStartService(service.name)}
+                      sx={{ marginRight: "10px" }}
+                    >
+                      Start
+                    </Button>
+                  )}
+
+                  {/* Stop Button */}
+                  {service.status === "Running" && (
+                    <Button
+                      variant="contained"
+                      color="error"
+                      onClick={() => handleStopService(service.name)}
+                      sx={{ marginRight: "10px" }}
+                    >
+                      Stop
+                    </Button>
+                  )}
+
+                  {/* Scale Up Button */}
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleScaleUp}
+                    sx={{ marginRight: "5px" }}
+                  >
+                    Scale Up
+                  </Button>
+
+                  {/* Scale Down Button */}
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => handleScaleDown(service.name)}
+                  >
+                    Scale Down
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      {/* 🔹 Logs Section */}
+      <Typography variant="h5" gutterBottom>Service Logs</Typography>
+      <Paper sx={{ maxHeight: "250px", overflowY: "auto", padding: "10px", border: "1px solid gray" }}>
+        <List>
+          {logs.map((log, index) => (
+            <ListItem key={index} divider>
+              <ListItemText primary={`${log.timestamp}: ${log.message}`} />
+            </ListItem>
+          ))}
+        </List>
+      </Paper>
+
+    </Box>
   );
 };
 

@@ -4,7 +4,7 @@ import VoiceCommand from "../components/VoiceCommand";
 const Home: React.FC = () => {
   return (
     <div>
-      <h1>AI-Powered Cloud Management</h1>
+      <h3>Dashbord</h3>
       <VoiceCommand />
       <Dashboard />
     </div>

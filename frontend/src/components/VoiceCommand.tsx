@@ -61,8 +61,20 @@ const VoiceCommand: React.FC = () => {
 
   return (
     <div>
-      <button onClick={startListening} disabled={isListening}>
-        {isListening ? "Listening..." : "Start Voice Command"}
+      <button
+        onClick={startListening}
+        disabled={isListening}
+        style={{
+          padding: "10px 15px",
+          fontSize: "16px",
+          cursor: "pointer",
+          backgroundColor: isListening ? "red" : "blue",
+          color: "white",
+          border: "none",
+          borderRadius: "5px",
+        }}
+      >
+        🎤{isListening ? "Listening..." : "Start Voice Command"}
       </button>
       <p>{transcript}</p>
     </div>
