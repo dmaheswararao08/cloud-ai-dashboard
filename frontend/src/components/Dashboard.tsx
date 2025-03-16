@@ -1,34 +1,81 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { Card, CardContent, Typography } from "@mui/material";
+import { io } from "socket.io-client";
 
-interface Service {
-  name: string;
-  podCount: number;
-  status: string;
-}
+const socket = io("http://localhost:5000");
 
-const Dashboard: React.FC = () => {
+const Dashboard = () => {
+  interface Service {
+    name: string;
+    podCount: number;
+    status: string;
+  }
+
   const [services, setServices] = useState<Service[]>([]);
+  interface Log {
+    timestamp: string;
+    message: string;
+  }
+
+  const [logs, setLogs] = useState<Log[]>([]);
 
   useEffect(() => {
-    axios.get<Service[]>("http://localhost:5000/api/running-vms")
-      .then(response => setServices(response.data))
-      .catch(error => console.error("Error fetching services:", error));
+    socket.on("connect", () => {
+      console.log("Connected to Socket.IO server:", socket.id);
+    });
+
+    socket.on("updateServers", (data) => {
+      console.log("Received real-time server update:", data);
+      setServices(data);
+    });
+
+    socket.on("disconnect", () => {
+      console.log("Socket disconnected. Attempting to reconnect...");
+    });
+
+    return () => {
+      socket.off("updateServers");
+      socket.off("connect");
+      socket.off("disconnect");
+    };
   }, []);
 
   return (
     <div>
       <h2>Running Services</h2>
-      {services.map((service, index) => (
-        <Card key={index} style={{ marginBottom: "10px" }}>
-          <CardContent>
-            <Typography variant="h6">{service.name}</Typography>
-            <Typography>Pods: {service.podCount}</Typography>
-            <Typography>Status: {service.status}</Typography>
-          </CardContent>
-        </Card>
-      ))}
+      <table border={1}>
+        <thead>
+          <tr>
+            <th>Service Name</th>
+            <th>Pod Count</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {services.map((service, index) => (
+            <tr key={index}>
+              <td>{service.name}</td>
+              <td>{service.podCount}</td>
+              <td>{service.status}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <h2>Logs</h2>
+      <div
+        style={{
+          maxHeight: "200px",
+          overflowY: "scroll",
+          border: "1px solid gray",
+          padding: "10px",
+        }}
+      >
+        {logs.map((log, index) => (
+          <p key={index}>
+            {log.timestamp}: {log.message}
+          </p>
+        ))}
+      </div>
     </div>
   );
 };
