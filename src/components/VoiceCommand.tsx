@@ -1,44 +1,68 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 
 const VoiceCommand: React.FC = () => {
-  const [listening, setListening] = useState(false);
   const [transcript, setTranscript] = useState("");
-  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  const [isListening, setIsListening] = useState(false);
 
-  useEffect(() => {
-    recognition.continuous = false;
-    recognition.lang = "en-US";
+  let recognition: SpeechRecognition | null = null;
+
+  if ("SpeechRecognition" in window || "webkitSpeechRecognition" in window) {
+    recognition = new (window.SpeechRecognition ||
+      window.webkitSpeechRecognition)();
+    recognition.continuous = true; // Keep listening after each command
+    recognition.lang = "en-IN"; // Set Indian English
     recognition.onresult = (event) => {
-      const spokenText = event.results[0][0].transcript.toLowerCase();
+      const spokenText =
+        event.results[event.results.length - 1][0].transcript.toLowerCase();
       setTranscript(spokenText);
       handleCommand(spokenText);
     };
-    recognition.onend = () => setListening(false);
-  }, []);
 
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognition.onerror = (event) => {
+      console.error("Speech recognition error:", event.error);
+      setIsListening(false);
+    };
+  } else {
+    console.error("Speech recognition is not supported in this browser.");
+  }
+
+  // Handle Voice Commands
   const handleCommand = (command: string) => {
     if (command.includes("stop vm")) {
-      axios.post("http://localhost:5000/api/stop-vm", { name: "example-vm" })
+      axios
+        .post("http://localhost:5000/api/stop-vm", { name: "example-vm" })
         .then(() => speak("VM has been stopped successfully"))
         .catch(() => speak("Failed to stop VM"));
+    } else {
+      speak("command not existied");
     }
   };
 
+  // Start Listening
   const startListening = () => {
-    setListening(true);
-    recognition.start();
+    if (!isListening && recognition) {
+      recognition.start();
+      setIsListening(true);
+    }
   };
 
+  // Speak Response
   const speak = (text: string) => {
     const speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "en-IN";
+    speech.onend = () => startListening(); // Restart after speaking
     window.speechSynthesis.speak(speech);
   };
 
   return (
     <div>
-      <button onClick={startListening} disabled={listening}>
-        {listening ? "Listening..." : "Start Voice Command"}
+      <button onClick={startListening} disabled={isListening}>
+        {isListening ? "Listening..." : "Start Voice Command"}
       </button>
       <p>{transcript}</p>
     </div>
