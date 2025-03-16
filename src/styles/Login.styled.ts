@@ -15,7 +15,7 @@ export const LoginLogo = styled.div`
   padding: 20px;
 `;
 export const StyledH5 = styled.h5`
-  color: green;
+  color: #339fff;
   text-transform: capitalize;
   letter-spacing: 1px;
   border-bottom: 2px solid;
@@ -42,7 +42,7 @@ export const DivStyle2 = styled.div`
   border: 2px solid;
   border-radius: 10px;
   padding: 10px;
-  background: green;
+  background: #339fff;
   color: white;
 `;
 
@@ -64,7 +64,7 @@ export const SpanStyle1 = styled.span`
 export const UlStyle1 = styled.ul`
   list-style-type: none;
   margin: 20px;
-  box-shadow: 2px 2px 2px 2px green;
+  box-shadow: 2px 2px 2px 2px #339fff;
   border-radius: 10px;
   padding: 10px 20px;
 `;
@@ -87,7 +87,7 @@ export const StatusStyle = styled.span`
   text-align: center;
   display: flex;
   justify-content: center;
-  background: green;
+  background: #339fff;
   color: white;
   font-weight: bolder;
   letter-spacing: 1px;
@@ -99,7 +99,7 @@ export const StyledDiv2 = styled.div`
 
 export const ButtonStyle1 = styled.button`
   border: none;
-  background: green;
+  background: #339fff;
   color: white;
   font-weight: 500;
   padding: 5px 15px;
@@ -110,7 +110,7 @@ export const ButtonStyle1 = styled.button`
 export const SpanStyle2 = styled.span`
   font-size: 15px;
   font-style: oblique;
-  color: green;
+  color: #339fff;
   font-weight: bold;
 `;
 
@@ -119,7 +119,7 @@ export const StyledLabel = styled.label`
   font-weight: 500;
   font-style: italic;
   text-transform: uppercase;
-  color: green;
+  color: #339fff;
 `;
 
 export const StyledLink = styled(Link)`

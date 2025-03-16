@@ -2,6 +2,8 @@ import { BrowserRouter as Router, useRoutes } from "react-router-dom";
 
 import Login from "../components/Login";
 import Home from "./Home";
+import Services from "./Services";
+import Logs from "./Logs";
 
 interface RoutesProps {
   isAuth: boolean;
@@ -35,6 +37,8 @@ const RoutesIndex = ({ isAuth, setIsAuth }: RoutesProps) => {
       element: <Login isAuth={isAuth} setIsAuth={setIsAuth} />,
     },
     { path: "/Dashbord", element: <Home /> },
+    { path: "/services", element: <Services /> },
+    { path: "/logs", element: <Logs /> },
   ]);
 
   return routes;

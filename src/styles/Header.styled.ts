@@ -6,6 +6,7 @@ export const StyledHeaderDiv = styled.div`
 export const StyledHeader = styled.nav`
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adjust the shadow as needed */
   background-color: #f8f9fa; /* Example background color, adjust as needed */
+  color: #339fff;
 `;
 export const StyledNavLink = styled.li`
   font-size: 15px;
