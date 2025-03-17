@@ -1,20 +1,23 @@
-FROM node:latest
+# Use Node.js as base image
+FROM node:18
 
-# Create a directory for the app
+# Set the working directory inside the container
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json to the container
+# Copy package.json and package-lock.json separately (to optimize Docker caching)
 COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy all other source code to the container
+# Copy the entire source code (including TypeScript files)
 COPY . .
 
-# Expose port 3000 (the port on which your Express app runs)
+# Build TypeScript project 
+RUN npm run build
+
+# Expose the correct port
 EXPOSE 5000
 
-# Command to run the application
-# RUN npm run dev
-CMD ["npm", "run","dev"]
+# Run the compiled JavaScript server
+CMD ["node", "dist/server.js"]
