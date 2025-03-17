@@ -6,6 +6,7 @@ import {
 } from "@mui/material";
 import { Cloud, CheckCircle, Cancel } from "@mui/icons-material";
 import PodDialog from "../components/PodDialog";
+import { baseAPIUrl } from "../config";
 
 // Service and Pod Interfaces
 interface Service {
@@ -29,7 +30,7 @@ const Services: React.FC = () => {
 
   // Fetch services
   useEffect(() => {
-    axios.get<Service[]>("http://localhost:5000/api/servers")
+    axios.get<Service[]>(baseAPIUrl+"/api/servers")
       .then(response => {
         console.log("Fetched services:", response.data);
         setServices(response.data);
@@ -44,7 +45,7 @@ const Services: React.FC = () => {
     setIsDialogOpen(true);
 
     try {
-      const response = await axios.get<Pod[]>(`http://localhost:5000/api/servers/${service.name}/pods`);
+      const response = await axios.get<Pod[]>(`${baseAPIUrl}/api/servers/pods/${service.name}`);
       setPods(response.data);
     } catch (error) {
       console.error("Error fetching pods:", error);

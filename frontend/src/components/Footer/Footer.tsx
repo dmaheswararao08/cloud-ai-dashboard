@@ -5,7 +5,7 @@ const Footer: React.FC = () => {
   return (
     <StyledFooter>
       <FooterText>
-        &copy; {new Date().getFullYear()} Evalutes. All rights reserved.
+        &copy; {new Date().getFullYear()} Echo innovators. All rights reserved.
       </FooterText>
     </StyledFooter>
   );

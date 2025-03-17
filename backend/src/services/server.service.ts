@@ -3,6 +3,12 @@ import { Server } from "socket.io";
 
 const computeClient = new InstancesClient();
 
+export interface Pod {
+  podName: string;
+  status: string;
+  logs: string;
+}
+
 // ✅ Get Running Servers
 export const getRunningServersService = async (projectId: string, zone: string) => {
   try {
@@ -115,4 +121,14 @@ export const scaleDownVM = async (projectId: string, zone: string, instanceName:
     console.error(`❌ Error scaling down VM ${instanceName}:`, error);
     throw error;
   }
+};
+
+export const getPodsByService = async (serviceName: string): Promise<Pod[]> => {
+  // Mock data - Replace with actual DB/API calls
+  const pods: Pod[] = [
+    { podName: "pod-1", status: "Running", logs: "Pod started successfully" },
+    { podName: "pod-2", status: "Stopped", logs: "Pod stopped due to error" },
+  ];
+
+  return pods;
 };

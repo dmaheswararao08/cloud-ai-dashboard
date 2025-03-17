@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { baseAPIUrl } from "../config";
 
 interface LogEntry {
   timestamp: string;
@@ -17,7 +18,7 @@ const Logs: React.FC = () => {
   useEffect(() => {
     if (serviceName) {
       axios
-        .get<LogEntry[]>(`http://localhost:5000/api/logs/${serviceName}`)
+        .get<LogEntry[]>(`${baseAPIUrl}/api/logs/${serviceName}`)
         .then((response) => {
           setLogs(response.data);
           speak(`Logs for ${serviceName} fetched successfully.`);

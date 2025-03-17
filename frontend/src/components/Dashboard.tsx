@@ -1,20 +1,42 @@
-import { useEffect, useState } from "react";
+import { Key, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import {
-  Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Paper, Typography,
-  Box, List, ListItem, ListItemText, Button
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Typography,
+  Box,
+  List,
+  ListItem,
+  ListItemText,
+  Button,
 } from "@mui/material";
 import axios from "axios";
+import { baseAPIUrl } from "../config";
 
 // ✅ Connect to Socket.IO server
-const socket = io("http://localhost:5000", {
+const socket = io(baseAPIUrl, {
   transports: ["websocket"],
   reconnectionAttempts: 5,
   reconnectionDelay: 3000,
 });
 
-const Dashboard = () => {
+// ✅ Log Interface
+interface Log {
+  timestamp: string;
+  message: string;
+}
+
+interface DashboardProps {
+  showLogs: Log[];
+}
+
+const Dashboard = ({ showLogs=[] }: DashboardProps) => {
+  console.log(showLogs,'showLogs')
   // ✅ Service Interface
   interface Service {
     name: string;
@@ -22,20 +44,20 @@ const Dashboard = () => {
     status: "Running" | "Stopped";
   }
 
-  // ✅ Log Interface
-  interface Log {
-    timestamp: string;
-    message: string;
-  }
-
   // ✅ States
   const [services, setServices] = useState<Service[]>([]);
-  const [logs, setLogs] = useState<Log[]>([]);
+  // const [logs, setLogs] = useState<Log[]>([]);
 
   // ✅ Fetch initial data from API
   useEffect(() => {
-    console.log("📡 Connecting to Socket.IO...",fetch("http://localhost:5000/api/servers")); 
-    console.log("📡 Connecting to Socket.IO...",fetch("http://localhost:5000/api/logs/sample"));
+    console.log(
+      "📡 Connecting to Socket.IO...",
+      fetch(baseAPIUrl+"/api/servers"),
+    );
+    console.log(
+      "📡 Connecting to Socket.IO...",
+      fetch(baseAPIUrl+"/api/logs/sample"),
+    );
 
     // ✅ Listen for real-time updates
     socket.on("updateServers", (data) => {
@@ -43,10 +65,10 @@ const Dashboard = () => {
       setServices(data);
     });
 
-    socket.on("serviceLogs", ({ logs }) => {
-      console.log("📜 Received Logs Update:", logs);
-      setLogs((prevLogs) => [...prevLogs, ...logs]);
-    });
+    // socket.on("serviceLogs", ({ logs }) => {
+    //   console.log("📜 Received Logs Update:", logs);
+    //   setLogs((prevLogs) => [...prevLogs, ...logs]);
+    // });
 
     return () => {
       socket.off("updateServers");
@@ -57,11 +79,15 @@ const Dashboard = () => {
   // ✅ Start Service
   const handleStartService = async (serviceName: string) => {
     try {
-      await axios.post(`http://localhost:5000/api/servers/${serviceName}/start`);
+      await axios.post(
+        `${baseAPIUrl}/api/servers/${serviceName}/start`,
+      );
       setServices((prev) =>
         prev.map((service) =>
-          service.name === serviceName ? { ...service, status: "Running" } : service
-        )
+          service.name === serviceName
+            ? { ...service, status: "Running" }
+            : service,
+        ),
       );
     } catch (error) {
       console.error("Error starting service:", error);
@@ -71,11 +97,13 @@ const Dashboard = () => {
   // ✅ Stop Service
   const handleStopService = async (serviceName: string) => {
     try {
-      await axios.post(`http://localhost:5000/api/servers/${serviceName}/stop`);
+      await axios.post(`${baseAPIUrl}/api/servers/${serviceName}/stop`);
       setServices((prev) =>
         prev.map((service) =>
-          service.name === serviceName ? { ...service, status: "Stopped" } : service
-        )
+          service.name === serviceName
+            ? { ...service, status: "Stopped" }
+            : service,
+        ),
       );
     } catch (error) {
       console.error("Error stopping service:", error);
@@ -85,9 +113,9 @@ const Dashboard = () => {
   // ✅ Scale Up Service
   const handleScaleUp = async () => {
     try {
-      await axios.post(`http://localhost:5000/api/servers/scale/up`);
+      await axios.post(`${baseAPIUrl}/api/servers/scale/up`);
       setServices((prev) =>
-        prev.map((service) => ({ ...service, podCount: service.podCount + 1 }))
+        prev.map((service) => ({ ...service, podCount: service.podCount + 1 })),
       );
     } catch (error) {
       console.error("Error scaling up:", error);
@@ -97,13 +125,15 @@ const Dashboard = () => {
   // ✅ Scale Down Service
   const handleScaleDown = async (serviceName: string) => {
     try {
-      await axios.post(`http://localhost:5000/api/servers/${serviceName}/scale/down`);
+      await axios.post(
+        `${baseAPIUrl}/api/servers/${serviceName}/scale/down`,
+      );
       setServices((prev) =>
         prev.map((service) =>
           service.name === serviceName
             ? { ...service, podCount: Math.max(0, service.podCount - 1) }
-            : service
-        )
+            : service,
+        ),
       );
     } catch (error) {
       console.error("Error scaling down:", error);
@@ -112,17 +142,26 @@ const Dashboard = () => {
 
   return (
     <Box sx={{ padding: "20px" }}>
-      
       {/* 🔹 Running Services Table */}
-      <Typography variant="h5" gutterBottom>Running Services</Typography>
+      <Typography variant="h5" gutterBottom>
+        Running Services
+      </Typography>
       <TableContainer component={Paper} sx={{ marginBottom: "20px" }}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell><b>Service Name</b></TableCell>
-              <TableCell><b>Pod Count</b></TableCell>
-              <TableCell><b>Status</b></TableCell>
-              <TableCell><b>Actions</b></TableCell>
+              <TableCell>
+                <b>Service Name</b>
+              </TableCell>
+              <TableCell>
+                <b>Pod Count</b>
+              </TableCell>
+              <TableCell>
+                <b>Status</b>
+              </TableCell>
+              <TableCell>
+                <b>Actions</b>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -133,7 +172,7 @@ const Dashboard = () => {
                 <TableCell
                   sx={{
                     color: service.status === "Running" ? "green" : "red",
-                    fontWeight: "bold"
+                    fontWeight: "bold",
                   }}
                 >
                   {service.status}
@@ -189,17 +228,36 @@ const Dashboard = () => {
       </TableContainer>
 
       {/* 🔹 Logs Section */}
-      <Typography variant="h5" gutterBottom>Service Logs</Typography>
-      <Paper sx={{ maxHeight: "250px", overflowY: "auto", padding: "10px", border: "1px solid gray" }}>
-        <List>
-          {logs.map((log, index) => (
-            <ListItem key={index} divider>
-              <ListItemText primary={`${log.timestamp}: ${log.message}`} />
-            </ListItem>
-          ))}
-        </List>
-      </Paper>
-
+      {showLogs.length > 0 && (
+        <>
+          <Typography variant="h5" gutterBottom>
+            Service Logs
+          </Typography>
+          <Paper
+            sx={{
+              maxHeight: "250px",
+              overflowY: "auto",
+              padding: "10px",
+              border: "1px solid gray",
+            }}
+          >
+            <List>
+              {showLogs.map(
+                (
+                  log: { timestamp: any; message: any },
+                  index: Key | null | undefined,
+                ) => (
+                  <ListItem key={index} divider>
+                    <ListItemText
+                      primary={`${log.timestamp}: ${log.message}`}
+                    />
+                  </ListItem>
+                ),
+              )}
+            </List>
+          </Paper>
+        </>
+      )}
     </Box>
   );
 };

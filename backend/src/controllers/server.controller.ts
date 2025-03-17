@@ -1,19 +1,31 @@
-import { Response, NextFunction } from "express";
+import { Response, NextFunction, query } from "express";
 import { CustomRequest } from "../types";
-import { getRunningServersService, startVM, stopVM, scaleUpVM, scaleDownVM } from "../services/server.service";
+import {
+  getRunningServersService,
+  startVM,
+  stopVM,
+  scaleUpVM,
+  scaleDownVM,
+  getPodsByService,
+} from "../services/server.service";
 
-const PROJECT_ID = "your-google-cloud-project-id";
-const ZONE = "your-zone"; // Example: "us-central1-a"
+const PROJECT_ID = "ltc-hack-prj-7";
+const ZONE = "asia-south1-b"; // Example: "us-central1-a"
 
 // ✅ Get Running Servers
-export const getRunningServers = async (req: CustomRequest, res: Response, next: NextFunction):Promise<any> => {
+export const getRunningServers = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<any> => {
   try {
     const servers = [
-        { name: "Server-1", status: "Running", podCount: 5 },
-        { name: "Server-2", status: "Stopped", podCount: 2 },
-        { name: "Server-3", status: "Stopped", podCount: 4 },
-      ];
-    // const servers = await getRunningServersService(PROJECT_ID, ZONE);
+      { name: "homes", status: "Running", podCount: 5 },
+      { name: "cards", status: "Stopped", podCount: 2 },
+      { name: "loans", status: "Stopped", podCount: 4 },
+    ];
+    // const serverstest = await getRunningServersService(PROJECT_ID, ZONE);
+    // console.log(serverstest,'test');
     req.io?.emit("updateServers", servers);
     return res.status(200).json(servers);
   } catch (error) {
@@ -23,11 +35,16 @@ export const getRunningServers = async (req: CustomRequest, res: Response, next:
 };
 
 // ✅ Start VM
-export const startVMController = async (req: CustomRequest, res: Response):Promise<any> => {
+export const startVMController = async (
+  req: CustomRequest,
+  res: Response,
+): Promise<any> => {
   const { serviceName } = req.params;
   try {
     if (!req.io) {
-      return res.status(500).json({ error: "Socket.io instance is not available" });
+      return res
+        .status(500)
+        .json({ error: "Socket.io instance is not available" });
     }
     const response = await startVM(PROJECT_ID, ZONE, serviceName, req.io);
     return res.json(response);
@@ -37,11 +54,16 @@ export const startVMController = async (req: CustomRequest, res: Response):Promi
 };
 
 // ✅ Stop VM
-export const stopVMController = async (req: CustomRequest, res: Response):Promise<any> => {
+export const stopVMController = async (
+  req: CustomRequest,
+  res: Response,
+): Promise<any> => {
   const { serviceName } = req.params;
   try {
     if (!req.io) {
-      return res.status(500).json({ error: "Socket.io instance is not available" });
+      return res
+        .status(500)
+        .json({ error: "Socket.io instance is not available" });
     }
     const response = await stopVM(PROJECT_ID, ZONE, serviceName, req.io);
     return res.json(response);
@@ -51,13 +73,23 @@ export const stopVMController = async (req: CustomRequest, res: Response):Promis
 };
 
 // ✅ Scale Up (Create New VM)
-export const scaleUpController = async (req: CustomRequest, res: Response):Promise<any> => {
+export const scaleUpController = async (
+  req: CustomRequest,
+  res: Response,
+): Promise<any> => {
   const { templateInstance } = req.body;
   try {
     if (!req.io) {
-      return res.status(500).json({ error: "Socket.io instance is not available" });
+      return res
+        .status(500)
+        .json({ error: "Socket.io instance is not available" });
     }
-    const response = await scaleUpVM(PROJECT_ID, ZONE, templateInstance, req.io);
+    const response = await scaleUpVM(
+      PROJECT_ID,
+      ZONE,
+      templateInstance,
+      req.io,
+    );
     return res.json(response);
   } catch (error) {
     return res.status(500).json({ error: "Failed to scale up VM" });
@@ -65,15 +97,34 @@ export const scaleUpController = async (req: CustomRequest, res: Response):Promi
 };
 
 // ✅ Scale Down (Delete VM)
-export const scaleDownController = async (req: CustomRequest, res: Response):Promise<any> => {
+export const scaleDownController = async (
+  req: CustomRequest,
+  res: Response,
+): Promise<any> => {
   const { serviceName } = req.params;
   try {
     if (!req.io) {
-      return res.status(500).json({ error: "Socket.io instance is not available" });
+      return res
+        .status(500)
+        .json({ error: "Socket.io instance is not available" });
     }
     const response = await scaleDownVM(PROJECT_ID, ZONE, serviceName, req.io);
     return res.json(response);
   } catch (error) {
     return res.status(500).json({ error: "Failed to scale down VM" });
+  }
+};
+
+export const getServicePods = async (
+  req: CustomRequest,
+  res: Response,
+): Promise<any> => {
+  try {
+    const { serviceName } = req.params;
+    const pods = await getPodsByService(serviceName);
+    res.json(pods);
+  } catch (error) {
+    console.error("Error fetching pods:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };

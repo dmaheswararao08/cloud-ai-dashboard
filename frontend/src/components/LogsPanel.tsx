@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Box, Typography, Paper } from "@mui/material";
 import { io } from "socket.io-client";
+import { baseAPIUrl } from "../config";
 
 interface LogEntry {
   timestamp: string;
@@ -12,7 +13,7 @@ interface LogsPanelProps {
   serviceName: string | null; // Name of the selected service
 }
 
-const socket = io("http://localhost:5000"); // Connect to WebSocket server
+const socket = io(baseAPIUrl); // Connect to WebSocket server
 
 const LogsPanel: React.FC<LogsPanelProps> = ({ serviceName }) => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
@@ -21,7 +22,7 @@ const LogsPanel: React.FC<LogsPanelProps> = ({ serviceName }) => {
     if (!serviceName) return;
 
     // Fetch logs when service is selected
-    axios.get<LogEntry[]>(`http://localhost:5000/api/logs?service=${serviceName}`)
+    axios.get<LogEntry[]>(`${baseAPIUrl}/api/logs?service=${serviceName}`)
       .then(response => setLogs(response.data))
       .catch(error => console.error("Error fetching logs:", error));
 
