@@ -101,8 +101,8 @@ const Services: React.FC = () => {
                   {/* Service Status */}
                   <Chip
                     label={service.status}
-                    icon={service.status === "Running" ? <CheckCircle /> : <Cancel />}
-                    color={service.status === "Running" ? "success" : "error"}
+                    icon={service.status === "RUNNING" ? <CheckCircle /> : <Cancel />}
+                    color={service.status === "RUNNING" ? "success" : "error"}
                     sx={{ mt: 1 }}
                   />
                 </CardContent>

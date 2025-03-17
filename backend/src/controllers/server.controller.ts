@@ -10,7 +10,7 @@ import {
 } from "../services/server.service";
 
 const PROJECT_ID = "ltc-hack-prj-7";
-const ZONE = "asia-south1-b"; // Example: "us-central1-a"
+const ZONE = "us-central1-c"; // Example: "us-central1-a"
 
 // ✅ Get Running Servers
 export const getRunningServers = async (
@@ -19,13 +19,13 @@ export const getRunningServers = async (
   next: NextFunction,
 ): Promise<any> => {
   try {
-    const servers = [
-      { name: "homes", status: "Running", podCount: 5 },
-      { name: "cards", status: "Stopped", podCount: 2 },
-      { name: "loans", status: "Stopped", podCount: 4 },
-    ];
-    // const serverstest = await getRunningServersService(PROJECT_ID, ZONE);
-    // console.log(serverstest,'test');
+    // const servers = [
+    //   { name: "homes", status: "Running", podCount: 5 },
+    //   { name: "cards", status: "Stopped", podCount: 2 },
+    //   { name: "loans", status: "Stopped", podCount: 4 },
+    // ];
+    const servers = await getRunningServersService(PROJECT_ID, ZONE);
+    console.log(servers,'test');
     req.io?.emit("updateServers", servers);
     return res.status(200).json(servers);
   } catch (error) {

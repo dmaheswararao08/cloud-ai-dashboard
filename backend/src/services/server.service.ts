@@ -1,6 +1,8 @@
 import { InstancesClient } from "@google-cloud/compute";
 import { Server } from "socket.io";
+import { ClusterManagerClient } from "@google-cloud/container";
 
+const containerClient = new ClusterManagerClient();
 const computeClient = new InstancesClient();
 
 export interface Pod {
@@ -10,27 +12,70 @@ export interface Pod {
 }
 
 // ✅ Get Running Servers
-export const getRunningServersService = async (projectId: string, zone: string) => {
+export const getRunningServersService = async (
+  projectId: string,
+  zone: string,
+) => {
   try {
-    const [instances] = await computeClient.list({
-      project: projectId,
-      zone: zone,
+    const [response] = await containerClient.listClusters({
+      parent: `projects/${projectId}/locations/-`, // Fetch all locations
     });
 
-    return instances
-      ? instances.map((vm) => ({
-          name: vm.name,
-          status: vm.status,
-        }))
-      : [];
+    if (!response.clusters) return [];
+
+    // Fetch pod count for each cluster
+    const clusterData = await Promise.all(
+      response.clusters.map(async (cluster) => {
+        const podCount = await getPodCount(
+          cluster.name || "",
+          "us-central1",
+          projectId,
+        );
+        return {
+          name: cluster.name,
+          status: cluster.status,
+          podCount,
+        };
+      }),
+    );
+
+    return clusterData;
   } catch (error) {
-    console.error("❌ Error fetching running VMs:", error);
+    console.error("❌ Error fetching clusters:", error);
     throw error;
   }
 };
 
+// Function to get pod count using `kubectl`
+const getPodCount = async (
+  clusterName: string,
+  zone: string,
+  projectId: string,
+): Promise<number> => {
+  try {
+    const k8s = await import("@kubernetes/client-node");
+    const namespace = "default";
+    const kc = new k8s.KubeConfig();
+    kc.loadFromDefault();
+    ;
+    kc.setCurrentContext(`gke_${projectId}_${zone}_${clusterName}`);
+    const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
+    const response = await k8sApi.listNamespacedPod(namespace);
+    console.log(`📦 Pod count for ${clusterName}:`, response.body.items.length);
+    return response.body.items.length;
+  } catch (error) {
+    console.error(`❌ Error fetching pod count for ${clusterName}:`, error);
+    return 0;
+  }
+};
+
 // ✅ Start a VM
-export const startVM = async (projectId: string, zone: string, instanceName: string, io: Server) => {
+export const startVM = async (
+  projectId: string,
+  zone: string,
+  instanceName: string,
+  io: Server,
+) => {
   try {
     const [operation] = await computeClient.start({
       project: projectId,
@@ -50,7 +95,12 @@ export const startVM = async (projectId: string, zone: string, instanceName: str
 };
 
 // ✅ Stop a VM
-export const stopVM = async (projectId: string, zone: string, instanceName: string, io: Server) => {
+export const stopVM = async (
+  projectId: string,
+  zone: string,
+  instanceName: string,
+  io: Server,
+) => {
   try {
     const [operation] = await computeClient.stop({
       project: projectId,
@@ -70,7 +120,12 @@ export const stopVM = async (projectId: string, zone: string, instanceName: stri
 };
 
 // ✅ Scale Up: Create a New Instance
-export const scaleUpVM = async (projectId: string, zone: string, templateInstance: string, io: Server) => {
+export const scaleUpVM = async (
+  projectId: string,
+  zone: string,
+  templateInstance: string,
+  io: Server,
+) => {
   try {
     const instanceName = `${templateInstance}-clone-${Date.now()}`;
     const [operation] = await computeClient.insert({
@@ -84,7 +139,8 @@ export const scaleUpVM = async (projectId: string, zone: string, templateInstanc
             boot: true,
             autoDelete: true,
             initializeParams: {
-              sourceImage: "projects/debian-cloud/global/images/family/debian-11",
+              sourceImage:
+                "projects/debian-cloud/global/images/family/debian-11",
             },
           },
         ],
@@ -104,7 +160,12 @@ export const scaleUpVM = async (projectId: string, zone: string, templateInstanc
 };
 
 // ✅ Scale Down: Delete an Instance
-export const scaleDownVM = async (projectId: string, zone: string, instanceName: string, io: Server) => {
+export const scaleDownVM = async (
+  projectId: string,
+  zone: string,
+  instanceName: string,
+  io: Server,
+) => {
   try {
     const [operation] = await computeClient.delete({
       project: projectId,
@@ -132,3 +193,22 @@ export const getPodsByService = async (serviceName: string): Promise<Pod[]> => {
 
   return pods;
 };
+
+// export const getPodsInClusterService = async (clusterName: string) => {
+//   try {
+//     const kc = new k8s.KubeConfig();
+//     kc.loadFromDefault();
+
+//     const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
+//     const response = await k8sApi.listPodForAllNamespaces();
+
+//     return response.items.map((pod) => ({
+//       podName: pod.metadata?.name,
+//       status: pod.status?.phase,
+//       namespace: pod.metadata?.namespace,
+//     }));
+//   } catch (error) {
+//     console.error("❌ Error fetching pods:", error);
+//     throw error;
+//   }
+// };

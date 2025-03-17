@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "ltc-hack-prj-7",
+  "private_key_id": "14942f19540c515f68ee3fe5106bc08b6f98aa49",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDAAwrgC32Tf2XH\nAZ47DARGTh4G0VIWeCmbFveyHXssb8U73BGpWG3gNM9Vq4g/+JtalBEmV1RWQHqk\n5RscrW1u2BDnaqaSJdw0q//IGBPsUqQzkGw8teQDXQ8W7ugBZM/EE0GdrFEiV+WJ\n5WOtLQRVxBMIlnGzrLK5m2aBa4C2ITN1CR6V5xuGB39HBK15apU78Dk9OZ/Jpi6/\nbCjqmsDOyKHUO+8E6ps5VXM4jn4RtPEGK4w35DHERg2qyiK3cP0cEzpcbw7FmzM5\nNBrs3n+8WqfG4SFQNBnNUwEFhYn7nm9EjMEN7V7MVoAF38rhco0t2Uxry3HVYIZW\n/csRWSuRAgMBAAECggEADWppARxsarjVAKGRT6jYR50/pdRMOvusVIS3S7+ZkpJA\nop0OstlV2/t0nRS+EVIqcJq11Ar3/orExu6nBUrswXjhPXoLJ1zz1M5LscxU4Acq\nJ9woY9mFk+KVolGQ7j//8EA0LnMSvCaOCCN54mipy+BGQCxax2YCmstLzzEWriLm\ntd0t53osa3AspaKUw73k1gxrHqQ+gDiP9DvizEIi6ICjQK3LSNx/DA6YUiM9Peob\nfiV8yHbbqg3UDNVeX8aH/4lVOIR5H9tc49H2Swuu2Ep1JLmZmq1s1vnaUQyBBtbr\nKu6ywsH/OuUCVQC2m8dyhhuOm/f4Jsy+f2JWNvsfUQKBgQDncoo5HqDx0dmXRc1k\nIY4RMyai1pSE6U7D/f1cIA+AVpPUjU0hYEFCO1Um6Tix56Vjdoyj+YKoSaXWqAK8\nsjOsehDYwMc3TRlS4b8qj7ISc8f4VK/m+aRa/vIpBTm0QylW/KeMyDA1MvmWHRff\nszahdDWaSIqcaZDRsrxfQ8PgHQKBgQDUYYtgbO1GoTGJFapSU4ULVV3J42jwztbD\nqOX+Jjxbb+bE0T7Av3QSr4b1OJr9Wq5AVrVGK7pd4Es61NsCqjpAsglFfrZ0GtXO\nuHbjrCwKqg7/xljnWyTu64XzLXq8p6HgU2t0fAnePfDjT8KEc4AOE8H1JCvclxbq\nP+k4vekHBQKBgQDGLwg4/Qcnyl+d7wF++lSiWcB9s2ydmwH9RaILntBnPrt7SDuB\nluCKjC/QD+iiPg8a6kpnpqHA5L+C3X7qgVVKHYQLdpefvP8wP2noUf9TWZ0kAbBW\nAfJAkQpfIcBVoSTm/ZWjMVBGXY3mgqcMwHLJMa8sm21FngeJ6JjwoiA56QKBgF4e\nGDkULJaXSq94dXFkZ9pc62JTsCa/UveEeuAFK8xNq9Pe8tNSROse9Ezp1+2c6QnE\nIzNEn6OIiW459BCbRZN0Ep3EiLCtT8D7iFxe6WmUcW8yBCYLAzQKFeNtbS37j8Ys\n0breWTUu9/iUWRx/XuleIh8z92gbYOFQj1dA+erNAoGBAM+abYXdLHP9lv/U8e0+\nAB85Hp42wyAcmXdlNQZ7IL1rYrmZJiPVmBBkRUIwSXYJe/f468cxqdlvlNAX/Xaz\nIPSdlT37iruXARfvFxm0/j2H7nIuF8R3qjuih6/FhqGqB0LM4SkeZo9XTdtG7vPS\ncWonR8Wu+MmvX0NronQalfBg\n-----END PRIVATE KEY-----\n",
+  "client_email": "gcp-compute-api@ltc-hack-prj-7.iam.gserviceaccount.com",
+  "client_id": "112342043767544202869",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/gcp-compute-api%40ltc-hack-prj-7.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

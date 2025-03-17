@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 import { baseAPIUrl } from "../config";
+// import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
+import RecordVoiceOverRoundedIcon from '@mui/icons-material/RecordVoiceOverRounded';
 
 interface LogEntry {
   timestamp: string;
@@ -111,7 +113,7 @@ const VoiceCommand: React.FC<VoiceCommandProps> = ({ voiceCommandCallBack }) => 
             borderRadius: "5px",
           }}
         >
-          🎤 Start Voice Command
+        <RecordVoiceOverRoundedIcon/>
         </button>
       ) : (
         // Stop Button
@@ -127,7 +129,7 @@ const VoiceCommand: React.FC<VoiceCommandProps> = ({ voiceCommandCallBack }) => 
             borderRadius: "5px",
           }}
         >
-          ⏹ Stop Listening
+          <RecordVoiceOverRoundedIcon />
         </button>
       )}
 

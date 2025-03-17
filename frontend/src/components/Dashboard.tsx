@@ -41,7 +41,7 @@ const Dashboard = ({ showLogs=[] }: DashboardProps) => {
   interface Service {
     name: string;
     podCount: number;
-    status: "Running" | "Stopped";
+    status: "RUNNING" | "Stopped";
   }
 
   // ✅ States
@@ -85,7 +85,7 @@ const Dashboard = ({ showLogs=[] }: DashboardProps) => {
       setServices((prev) =>
         prev.map((service) =>
           service.name === serviceName
-            ? { ...service, status: "Running" }
+            ? { ...service, status: "RUNNING" }
             : service,
         ),
       );
@@ -171,7 +171,7 @@ const Dashboard = ({ showLogs=[] }: DashboardProps) => {
                 <TableCell>{service.podCount}</TableCell>
                 <TableCell
                   sx={{
-                    color: service.status === "Running" ? "green" : "red",
+                    color: service.status === "RUNNING" ? "green" : "red",
                     fontWeight: "bold",
                   }}
                 >
@@ -191,7 +191,7 @@ const Dashboard = ({ showLogs=[] }: DashboardProps) => {
                   )}
 
                   {/* Stop Button */}
-                  {service.status === "Running" && (
+                  {service.status === "RUNNING" && (
                     <Button
                       variant="contained"
                       color="error"
