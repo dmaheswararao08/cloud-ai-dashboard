@@ -1,7 +1,10 @@
 import { InstancesClient } from "@google-cloud/compute";
 import { Server } from "socket.io";
 import { ClusterManagerClient } from "@google-cloud/container";
+import { exec } from "child_process";
+import util from "util";
 
+const execPromise = util.promisify(exec);
 const containerClient = new ClusterManagerClient();
 const computeClient = new InstancesClient();
 
@@ -194,21 +197,20 @@ export const getPodsByService = async (serviceName: string): Promise<Pod[]> => {
   return pods;
 };
 
-// export const getPodsInClusterService = async (clusterName: string) => {
-//   try {
-//     const kc = new k8s.KubeConfig();
-//     kc.loadFromDefault();
+export const getPodsByService1 = async (clusterName: string) => {
+  try {
+    // Set the correct Kubernetes context for the cluster
+    await execPromise(`kubectl config use-context gke_ltc-hack-prj-7_us-central1_${clusterName}`);
 
-//     const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
-//     const response = await k8sApi.listPodForAllNamespaces();
+    // Get the pods in the default namespace
+    const { stdout } = await execPromise(`kubectl get pods -n default --no-headers -o custom-columns=":metadata.name"`);
 
-//     return response.items.map((pod) => ({
-//       podName: pod.metadata?.name,
-//       status: pod.status?.phase,
-//       namespace: pod.metadata?.namespace,
-//     }));
-//   } catch (error) {
-//     console.error("❌ Error fetching pods:", error);
-//     throw error;
-//   }
-// };
+    const pods = stdout.trim().split("\n").filter(Boolean);
+    console.log(`📦 Pods in ${clusterName}:`, pods);
+
+    return pods;
+  } catch (error) {
+    console.error(`❌ Error fetching pods for ${clusterName}:`, error);
+    return [];
+  }
+};

@@ -7,6 +7,7 @@ import {
   scaleUpVM,
   scaleDownVM,
   getPodsByService,
+  getPodsByService1,
 } from "../services/server.service";
 
 const PROJECT_ID = "ltc-hack-prj-7";
@@ -122,6 +123,20 @@ export const getServicePods = async (
   try {
     const { serviceName } = req.params;
     const pods = await getPodsByService(serviceName);
+    res.json(pods);
+  } catch (error) {
+    console.error("Error fetching pods:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const getServicePods1 = async (
+  req: CustomRequest,
+  res: Response,
+): Promise<any> => {
+  try {
+    const { serviceName } = req.params;
+    const pods = await getPodsByService1(serviceName);
     res.json(pods);
   } catch (error) {
     console.error("Error fetching pods:", error);
