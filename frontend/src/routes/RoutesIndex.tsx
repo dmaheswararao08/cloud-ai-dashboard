@@ -4,6 +4,7 @@ import Login from "../components/Login";
 import Home from "./Home";
 import Services from "./Services";
 import Logs from "./Logs";
+import DeveloperResources from "../components/DeveloperResources";
 
 interface RoutesProps {
   isAuth: boolean;
@@ -38,6 +39,7 @@ const RoutesIndex = ({ isAuth, setIsAuth }: RoutesProps) => {
     },
     { path: "/Dashbord", element: <Home /> },
     { path: "/services", element: <Services /> },
+    { path: "/developer-resources", element: <DeveloperResources /> },
     { path: "/logs", element: <Logs /> },
   ]);
 
