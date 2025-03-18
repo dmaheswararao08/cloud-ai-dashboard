@@ -34,7 +34,7 @@ export const getRunningServersService = async (
         return {
           name: cluster.name,
           status: cluster.status,
-          podCount,
+          podCount:2,
         };
       }),
     );
