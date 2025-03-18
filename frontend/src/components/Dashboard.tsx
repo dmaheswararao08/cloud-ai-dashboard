@@ -14,6 +14,7 @@ import {
   ListItem,
   ListItemText,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import axios from "axios";
 import { baseAPIUrl } from "../config";
@@ -46,6 +47,7 @@ const Dashboard = ({ showLogs=[] }: DashboardProps) => {
 
   // ✅ States
   const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   // const [logs, setLogs] = useState<Log[]>([]);
 
   // ✅ Fetch initial data from API
@@ -60,9 +62,10 @@ const Dashboard = ({ showLogs=[] }: DashboardProps) => {
     );
 
     // ✅ Listen for real-time updates
+    setLoading(true);
     socket.on("updateServers", (data) => {
-      console.log("🔄 Received Server Update:", data);
       setServices(data);
+      setLoading(false);
     });
 
     // socket.on("serviceLogs", ({ logs }) => {
@@ -71,6 +74,7 @@ const Dashboard = ({ showLogs=[] }: DashboardProps) => {
     // });
 
     return () => {
+      setLoading(false);
       socket.off("updateServers");
       socket.off("serviceLogs");
     };
@@ -146,6 +150,9 @@ const Dashboard = ({ showLogs=[] }: DashboardProps) => {
       <Typography variant="h5" gutterBottom>
         Running Services
       </Typography>
+      {loading?(<Box display="flex" justifyContent="center">
+                <CircularProgress />
+              </Box>):(
       <TableContainer component={Paper} sx={{ marginBottom: "20px" }}>
         <Table>
           <TableHead>
@@ -225,7 +232,7 @@ const Dashboard = ({ showLogs=[] }: DashboardProps) => {
             ))}
           </TableBody>
         </Table>
-      </TableContainer>
+      </TableContainer>)}
 
       {/* 🔹 Logs Section */}
       {showLogs.length > 0 && (
@@ -237,8 +244,12 @@ const Dashboard = ({ showLogs=[] }: DashboardProps) => {
             sx={{
               maxHeight: "250px",
               overflowY: "auto",
+              overflowX: "auto",
               padding: "10px",
+              maxWidth: "80vw",
               border: "1px solid gray",
+              backgroundColor: "#000",
+              color: "#fff",
             }}
           >
             <List>

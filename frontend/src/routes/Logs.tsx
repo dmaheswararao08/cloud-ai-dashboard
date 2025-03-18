@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { baseAPIUrl } from "../config";
+import { Paper } from "@mui/material";
 
 interface LogEntry {
   timestamp: string;
@@ -32,7 +33,7 @@ const Logs: React.FC = () => {
   useEffect(() => {
     if (searchQuery) {
       const filtered = logs.filter((log) =>
-        log.message.toLowerCase().includes(searchQuery.toLowerCase())
+        log.message.toLowerCase().includes(searchQuery.toLowerCase()),
       );
       setFilteredLogs(filtered);
     } else {
@@ -43,7 +44,8 @@ const Logs: React.FC = () => {
   // Voice Search Functionality for Service Name
   const startListeningForService = () => {
     const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
       alert("Speech recognition is not supported in your browser.");
@@ -77,7 +79,14 @@ const Logs: React.FC = () => {
       <h3>Service Logs</h3>
 
       {/* Service Name Input + Voice Search */}
-      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "15px" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          marginBottom: "15px",
+        }}
+      >
         <input
           type="text"
           placeholder="Enter Service Name..."
@@ -94,7 +103,7 @@ const Logs: React.FC = () => {
             backgroundColor: isListening ? "red" : "blue",
             color: "white",
             border: "none",
-            borderRadius: "5px"
+            borderRadius: "5px",
           }}
         >
           🎤 {isListening ? "Listening..." : "Voice Input"}
@@ -111,7 +120,17 @@ const Logs: React.FC = () => {
       /> */}
 
       {/* Logs Display */}
-      <pre style={{ border: "1px solid gray", padding: "10px", maxHeight: "300px", overflowY: "auto" }}>
+      <Paper
+        sx={{
+          border: "1px solid gray",
+          padding: "10px",
+          height: "70vh",
+          width: "80vw",
+          overflowY: "auto",
+          backgroundColor: "#000",
+          color: "#fff",
+        }}
+      >
         {filteredLogs.length > 0 ? (
           filteredLogs.map((log, index) => (
             <div key={index}>
@@ -121,7 +140,7 @@ const Logs: React.FC = () => {
         ) : (
           <p>No logs found.</p>
         )}
-      </pre>
+      </Paper>
     </div>
   );
 };
